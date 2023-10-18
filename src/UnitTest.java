@@ -14,4 +14,13 @@ public class UnitTest {
         }
         return false; // to modify
     }
+
+    public static Method setupMethod(Class objClass, String methodName, Class... paramsClass){
+        try {
+            return objClass.getMethod(methodName, paramsClass);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 }

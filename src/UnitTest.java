@@ -2,20 +2,27 @@ import java.lang.reflect.Method;
 
 public class UnitTest {
     public static boolean test(Object obj, Method function, Object[][] parametersList, Object[] resultList) throws Exception{
+        boolean allTestsPassed = true;
         try {
             int i = 0;
             while(i != parametersList.length){
                 long startTime = System.nanoTime();
                 Object result = function.invoke(obj, parametersList[i]);
                 long elapsedTime = System.nanoTime() - startTime;
-                System.out.println("Scenario " + (i+1) + ": " + (result.equals(resultList[i]) ? "\033[1;32m" : "\033[1;31m") + result.equals(resultList[i]) + "\033[0m" + " in: " + elapsedTime + "ms");
+                if(result.equals(resultList[i])){
+                    System.out.println("Scenario " + "\033[1;97m" + (i+1) + "\033[0m" + ": " + "\033[1;32m" + "passed" + "\033[0m" + " in: " + elapsedTime + "ms");
+                }
+                else{
+                    System.out.println("Scenario " + "\033[1;97m" + (i+1) + "\033[0m" + ": " + "\033[1;31m" + "failed" + "\033[0m" + " (Expected Return: " + resultList[i] + ", Actual Return: " + result + ") in: " + elapsedTime + "ms");
+                    allTestsPassed = false;
+                }
                 // System.out.println("Result: " + result + " | Expected Result: " + resultList[i] + " | Same: " + result.equals(resultList[i]));
                 i++;
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return false; // to modify
+        return allTestsPassed;
     }
 
     public static Method setupMethod(Class objClass, String methodName, Class... paramsClass){

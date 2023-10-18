@@ -9,47 +9,52 @@ public class UnitTest {
 
     private static Config _config = Config.Default;
 
-    public static boolean test(Object obj, Method function, Object[][] parametersList, Object[] resultList) throws Exception {
+    public static boolean test(Object obj, Method function, Object[][] parametersList, Object[] resultList)
+            throws Exception {
         boolean allTestsPassed = true;
-        try {
-            int i = 0;
-            while(i != parametersList.length){
-                long startTime = System.nanoTime();
-                Object result = function.invoke(obj, parametersList[i]);
-                long elapsedTime = System.nanoTime() - startTime;
-                switch (_config){
-                    case Default : 
-                        if(!defaultMode(result, resultList[i], i+1, elapsedTime)) allTestsPassed = false;
-                        break;
-                    case Advanced :
-                        if(!advancedMode(result, resultList[i], i+1, elapsedTime)) allTestsPassed = false;
-                        break;
-                    case No_Console :
-                        if(result.equals(resultList[i])) allTestsPassed = false;
-                        break;
-                }
+        int i = 0;
 
-                i++;
+        while (i != parametersList.length) {
+            double startTime = System.nanoTime();
+            Object result = function.invoke(obj, parametersList[i]);
+            double elapsedTime = (double)Math.round(((System.nanoTime()-startTime) * 0.000001) * 1000d) / 1000d;
+            // elapsedTime /= 10000;
+
+            switch (_config) {
+                case Default:
+                    if (!defaultMode(result, resultList[i], i + 1, elapsedTime))
+                        allTestsPassed = false;
+                    break;
+                case Advanced:
+                    if (!advancedMode(result, resultList[i], i + 1, elapsedTime))
+                        allTestsPassed = false;
+                    break;
+                case No_Console:
+                    if (result.equals(resultList[i]))
+                        allTestsPassed = false;
+                    break;
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+            i++;
         }
         return allTestsPassed;
     }
 
-    private static boolean advancedMode(Object result, Object expectedResult, int scenarioNum, long elapsedTime) {
-        if(result.equals(expectedResult)) {
-            System.out.println("Scenario " + "\033[1;97m" + (scenarioNum) + "\033[0m" + ": " + "\033[1;32m" + "passed" + "\033[0m" + " in: " + elapsedTime + "ms");
+    private static boolean advancedMode(Object result, Object expectedResult, int scenarioNum, double elapsedTime) {
+        if (result.equals(expectedResult)) {
+            System.out.println("Scenario " + "\033[1;97m" + (scenarioNum) + "\033[0m" + ": " + "\033[1;32m" + "passed"
+                    + "\033[0m" + " in: " + elapsedTime + "ms");
             return true;
-        }
-        else {
-            System.out.println("Scenario " + "\033[1;97m" + (scenarioNum) + "\033[0m" + ": " + "\033[1;31m" + "failed" + "\033[0m" + " (Expected Return: " + expectedResult + ", Actual Return: " + result + ") in: " + elapsedTime + "ms");
+        } else {
+            System.out.println("Scenario " + "\033[1;97m" + (scenarioNum) + "\033[0m" + ": " + "\033[1;31m" + "failed"
+                    + "\033[0m" + " (Expected Return: " + expectedResult + ", Actual Return: " + result + ") in: "
+                    + elapsedTime + "ms");
             return false;
         }
     }
 
-    private static boolean defaultMode(Object result, Object expectedResult, int scenarioNum, long elapsedTime) {
-        System.out.println("Scenario " + "\033[1;97m" + (scenarioNum) + "\033[0m" + ": " + (result.equals(expectedResult) ? "\033[1;32m" + "passed" : "\033[1;31m" + "failed")  + "\033[0m");
+    private static boolean defaultMode(Object result, Object expectedResult, int scenarioNum, double elapsedTime) {
+        System.out.println("Scenario " + "\033[1;97m" + (scenarioNum) + "\033[0m" + ": "
+                + (result.equals(expectedResult) ? "\033[1;32m" + "passed" : "\033[1;31m" + "failed") + "\033[0m");
         return result.equals(expectedResult);
     }
 

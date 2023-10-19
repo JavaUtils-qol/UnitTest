@@ -1,6 +1,12 @@
 import java.lang.reflect.Method;
 
+/**
+ * This class aids with debugging by providing an easy way to test scenarios.
+ */
 public class UnitTest {
+    /**
+     * Contains the different precisions of unit test.
+     */
     public static enum Config {
         Default,
         Advanced,
@@ -8,17 +14,15 @@ public class UnitTest {
     }
 
     private static Config _config = Config.Default;
-
-    public static boolean test(Object obj, Method function, Object[][] parametersList, Object[] resultList)
-            throws Exception {
+    
+    public static boolean test(Object obj, Method function, Object[][] parametersList, Object[] resultList) throws Exception {
         boolean allTestsPassed = true;
         int i = 0;
 
         while (i != parametersList.length) {
             double startTime = System.nanoTime();
             Object result = function.invoke(obj, parametersList[i]);
-            double elapsedTime = (double)Math.round(((System.nanoTime()-startTime) * 0.000001) * 1000d) / 1000d;
-            // elapsedTime /= 10000;
+            double elapsedTime = (double) Math.round(((System.nanoTime() - startTime) * 0.000001) * 1000d) / 1000d;
 
             switch (_config) {
                 case Default:
@@ -39,6 +43,57 @@ public class UnitTest {
         return allTestsPassed;
     }
 
+    public static boolean test(Method function, Object[][] parametersList, Object[] resultList) throws Exception {
+        boolean allTestsPassed = true;
+        int i = 0;
+
+        while (i != parametersList.length) {
+            double startTime = System.nanoTime();
+            Object result = function.invoke(null, parametersList[i]);
+            double elapsedTime = (double) Math.round(((System.nanoTime() - startTime) * 0.000001) * 1000d) / 1000d;
+
+            switch (_config) {
+                case Default:
+                    if (!defaultMode(result, resultList[i], i + 1, elapsedTime))
+                        allTestsPassed = false;
+                    break;
+                case Advanced:
+                    if (!advancedMode(result, resultList[i], i + 1, elapsedTime))
+                        allTestsPassed = false;
+                    break;
+                case No_Console:
+                    if (result.equals(resultList[i]))
+                        allTestsPassed = false;
+                    break;
+            }
+            i++;
+        }
+        return allTestsPassed;
+    }
+    
+    public static Method setupMethod(Class objClass, String methodName, Class... paramsClass) {
+        try {
+            return objClass.getMethod(methodName, paramsClass);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+    
+    public static void setConfig(Config config) {
+        _config = config;
+    }
+    
+    public static Config getConfig() {
+        return _config;
+    }
+
+
+
+    
+    
+    private UnitTest(){} // set constructor to private to stop object creation
+
     private static boolean advancedMode(Object result, Object expectedResult, int scenarioNum, double elapsedTime) {
         if (result.equals(expectedResult)) {
             System.out.println("Scenario " + "\033[1;97m" + (scenarioNum) + "\033[0m" + ": " + "\033[1;32m" + "passed"
@@ -51,27 +106,10 @@ public class UnitTest {
             return false;
         }
     }
-
+    
     private static boolean defaultMode(Object result, Object expectedResult, int scenarioNum, double elapsedTime) {
         System.out.println("Scenario " + "\033[1;97m" + (scenarioNum) + "\033[0m" + ": "
                 + (result.equals(expectedResult) ? "\033[1;32m" + "passed" : "\033[1;31m" + "failed") + "\033[0m");
         return result.equals(expectedResult);
-    }
-
-    public static Method setupMethod(Class objClass, String methodName, Class... paramsClass) {
-        try {
-            return objClass.getMethod(methodName, paramsClass);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    public static void setConfig(Config config) {
-        _config = config;
-    }
-
-    public static Config getConfig() {
-        return _config;
     }
 }

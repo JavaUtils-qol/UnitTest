@@ -15,13 +15,23 @@ public class UnitTest {
 
     private static Config _config = Config.Default;
     
-    public static boolean test(Object obj, Method function, Object[][] parametersList, Object[] resultList) throws Exception {
+    /**
+     * Will test the given method with the given parameters and will then compare the result with the given expected result.
+     * 
+     * @param obj - Object of the same class as the method
+     * @param method (Method) - result of {@code setupMethod()}
+     * @param parametersList (Object[][]) - array of parameters
+     * @param resultList (Object[]) - array of expected results
+     * @return <b>true/false</b> depending on whether all tests passed
+     * @throws Exception not specific
+     */
+    public static boolean test(Object obj, Method method, Object[][] parametersList, Object[] resultList) throws Exception {
         boolean allTestsPassed = true;
         int i = 0;
 
         while (i != parametersList.length) {
             double startTime = System.nanoTime();
-            Object result = function.invoke(obj, parametersList[i]);
+            Object result = method.invoke(obj, parametersList[i]);
             double elapsedTime = (double) Math.round(((System.nanoTime() - startTime) * 0.000001) * 1000d) / 1000d;
 
             switch (_config) {
@@ -43,13 +53,22 @@ public class UnitTest {
         return allTestsPassed;
     }
 
-    public static boolean test(Method function, Object[][] parametersList, Object[] resultList) throws Exception {
+    /**
+     * Will test the given static method with the given parameters and will then compare the result with the given expected result.
+     * 
+     * @param method (Method) - result of {@code setupMethod()}
+     * @param parametersList (Object[][]) - array of parameters
+     * @param resultList (Object[]) - array of expected results
+     * @return <b>true/false</b> depending on whether all tests passed
+     * @throws Exception not specific
+     */
+    public static boolean test(Method method, Object[][] parametersList, Object[] resultList) throws Exception {
         boolean allTestsPassed = true;
         int i = 0;
 
         while (i != parametersList.length) {
             double startTime = System.nanoTime();
-            Object result = function.invoke(null, parametersList[i]);
+            Object result = method.invoke(null, parametersList[i]);
             double elapsedTime = (double) Math.round(((System.nanoTime() - startTime) * 0.000001) * 1000d) / 1000d;
 
             switch (_config) {
@@ -71,6 +90,16 @@ public class UnitTest {
         return allTestsPassed;
     }
     
+    /**
+     * Used to replace the need to import {@code java.lang.reflec.Method} in the main class.
+     * <br><br>
+     * If you still want to use the import way you can do {@code objClass.getMethod(methodName, paramsClass)}
+     * 
+     * @param objClass (Class) - parameter format: {@code ClassName.class}
+     * @param methodName - name of the method
+     * @param paramsClass (Class) - parameter format: {@code primitive.class, Object.class}
+     * @return <b>method</b> (Method) - method for {@code test()}
+     */
     public static Method setupMethod(Class objClass, String methodName, Class... paramsClass) {
         try {
             return objClass.getMethod(methodName, paramsClass);
@@ -80,10 +109,20 @@ public class UnitTest {
         return null;
     }
     
+    /**
+     * Will set the {@code UnitTest} class console output to a certain degree of precision.
+     * 
+     * @param config (Config) - config to set
+     */
     public static void setConfig(Config config) {
         _config = config;
     }
     
+    /**
+     * Will return the degree of precision of UnitTest.
+     * 
+     * @return <b>state</b> (Config) - {@code UnitTest} precision
+     */
     public static Config getConfig() {
         return _config;
     }

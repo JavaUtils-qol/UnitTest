@@ -8,8 +8,17 @@ public class UnitTest {
      * Contains the different precisions of unit test.
      */
     public static enum Config {
+        /**
+         * Will only display if the Scenario passed.
+         */
         Default,
+        /**
+         * Will display if the Scenario passed along with the time it took and if it didn't it will display the return value it gave.
+         */
         Advanced,
+        /**
+         * Will display absolutely nothing but will still return true/false if all the Scenario passed.
+         */
         No_Console
     }
 
@@ -26,14 +35,17 @@ public class UnitTest {
      * @throws Exception not specific
      */
     public static boolean test(Object obj, Method method, Object[][] parametersList, Object[] resultList) throws Exception {
+        // declare vars
         boolean allTestsPassed = true;
         int i = 0;
 
         while (i != parametersList.length) {
+            // calculate elapsed time + get method result
             double startTime = System.nanoTime();
             Object result = method.invoke(obj, parametersList[i]);
             double elapsedTime = (double) Math.round(((System.nanoTime() - startTime) * 0.000001) * 1000d) / 1000d;
 
+            // output to console depending on config
             switch (_config) {
                 case Default:
                     if (!defaultMode(result, resultList[i], i + 1, elapsedTime))
@@ -63,14 +75,17 @@ public class UnitTest {
      * @throws Exception not specific
      */
     public static boolean test(Method method, Object[][] parametersList, Object[] resultList) throws Exception {
+        // declare vars
         boolean allTestsPassed = true;
         int i = 0;
 
         while (i != parametersList.length) {
+            // calculate elapsed time + get method result
             double startTime = System.nanoTime();
             Object result = method.invoke(null, parametersList[i]);
             double elapsedTime = (double) Math.round(((System.nanoTime() - startTime) * 0.000001) * 1000d) / 1000d;
 
+            // output to console depending on config
             switch (_config) {
                 case Default:
                     if (!defaultMode(result, resultList[i], i + 1, elapsedTime))
@@ -102,6 +117,7 @@ public class UnitTest {
      */
     public static Method setupMethod(Class objClass, String methodName, Class... paramsClass) {
         try {
+            // setup method
             return objClass.getMethod(methodName, paramsClass);
         } catch (Exception e) {
             e.printStackTrace();

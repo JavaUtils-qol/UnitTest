@@ -7,30 +7,30 @@ public class UnitTest {
     /**
      * Contains the different precisions of unit test.
      */
-    public static enum Config {
+    public static enum Verbose {
         /**
          * Will only display if the Scenario passed.
          */
-        Default,
+        DEFAULT,
         /**
          * Will display if the Scenario passed along with the time it took and if it didn't it will display the return value it gave.
          */
-        Advanced,
+        DETAILED,
         /**
          * Will display absolutely nothing but will still return true/false if all the Scenario passed.
          */
-        No_Console
+        NONE
     }
 
-    private static Config _config = Config.Default;
-    
+    private static Verbose _config = Verbose.DEFAULT;
+
     /**
      * Will test the given method with the given parameters and will then compare the result with the given expected result.
-     * 
-     * @param obj - Object of the same class as the method
-     * @param method (Method) - result of {@code setupMethod()}
+     *
+     * @param obj            - Object of the same class as the method
+     * @param method         (Method) - result of {@code setupMethod()}
      * @param parametersList (Object[][]) - array of parameters
-     * @param resultList (Object[]) - array of expected results
+     * @param resultList     (Object[]) - array of expected results
      * @return <b>true/false</b> depending on whether all tests passed
      * @throws Exception not specific
      */
@@ -47,15 +47,15 @@ public class UnitTest {
 
             // output to console depending on config
             switch (_config) {
-                case Default:
-                    if (!defaultMode(result, resultList[i], i + 1, elapsedTime))
+                case DEFAULT:
+                    if (defaultMode(result, resultList[i], i + 1, elapsedTime))
                         allTestsPassed = false;
                     break;
-                case Advanced:
-                    if (!advancedMode(result, resultList[i], i + 1, elapsedTime))
+                case DETAILED:
+                    if (advancedMode(result, resultList[i], i + 1, elapsedTime))
                         allTestsPassed = false;
                     break;
-                case No_Console:
+                case NONE:
                     if (result.equals(resultList[i]))
                         allTestsPassed = false;
                     break;
@@ -67,10 +67,10 @@ public class UnitTest {
 
     /**
      * Will test the given static method with the given parameters and will then compare the result with the given expected result.
-     * 
-     * @param method (Method) - result of {@code setupMethod()}
+     *
+     * @param method         (Method) - result of {@code setupMethod()}
      * @param parametersList (Object[][]) - array of parameters
-     * @param resultList (Object[]) - array of expected results
+     * @param resultList     (Object[]) - array of expected results
      * @return <b>true/false</b> depending on whether all tests passed
      * @throws Exception not specific
      */
@@ -87,15 +87,15 @@ public class UnitTest {
 
             // output to console depending on config
             switch (_config) {
-                case Default:
-                    if (!defaultMode(result, resultList[i], i + 1, elapsedTime))
+                case DEFAULT:
+                    if (defaultMode(result, resultList[i], i + 1, elapsedTime))
                         allTestsPassed = false;
                     break;
-                case Advanced:
-                    if (!advancedMode(result, resultList[i], i + 1, elapsedTime))
+                case DETAILED:
+                    if (advancedMode(result, resultList[i], i + 1, elapsedTime))
                         allTestsPassed = false;
                     break;
-                case No_Console:
+                case NONE:
                     if (result.equals(resultList[i]))
                         allTestsPassed = false;
                     break;
@@ -104,14 +104,14 @@ public class UnitTest {
         }
         return allTestsPassed;
     }
-    
+
     /**
      * Used to replace the need to import {@code java.lang.reflec.Method} in the main class.
      * <br><br>
      * If you still want to use the import way you can do {@code objClass.getMethod(methodName, paramsClass)}
-     * 
-     * @param objClass (Class) - parameter format: {@code ClassName.class}
-     * @param methodName - name of the method
+     *
+     * @param objClass    (Class) - parameter format: {@code ClassName.class}
+     * @param methodName  - name of the method
      * @param paramsClass (Class) - parameter format: {@code primitive.class, Object.class}
      * @return <b>method</b> (Method) - method for {@code test()}
      */
@@ -119,52 +119,51 @@ public class UnitTest {
         try {
             // setup method
             return objClass.getMethod(methodName, paramsClass);
+            //! Unchecked call to 'getMethod(String, Class<?>...)' as a member of raw type 'java.lang.Class'
         } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
     }
-    
+
     /**
      * Will set the {@code UnitTest} class console output to a certain degree of precision.
-     * 
-     * @param config (Config) - config to set
+     *
+     * @param config (Verbose) - config to set
      */
-    public static void setConfig(Config config) {
+    public static void setConfig(Verbose config) {
         _config = config;
     }
-    
+
     /**
      * Will return the degree of precision of UnitTest.
-     * 
-     * @return <b>state</b> (Config) - {@code UnitTest} precision
+     *
+     * @return <b>state</b> (Verbose) - {@code UnitTest} precision
      */
-    public static Config getConfig() {
+    public static Verbose getConfig() {
         return _config;
     }
 
 
-
-    
-    
-    private UnitTest(){} // set constructor to private to stop object creation
+    private UnitTest() {
+    } // set constructor to private to stop object creation
 
     private static boolean advancedMode(Object result, Object expectedResult, int scenarioNum, double elapsedTime) {
         if (result.equals(expectedResult)) {
             System.out.println("Scenario " + "\033[1;97m" + (scenarioNum) + "\033[0m" + ": " + "\033[1;32m" + "passed"
-                    + "\033[0m" + " in: " + elapsedTime + "ms");
-            return true;
+                + "\033[0m" + " in: " + elapsedTime + "ms");
+            return false;
         } else {
             System.out.println("Scenario " + "\033[1;97m" + (scenarioNum) + "\033[0m" + ": " + "\033[1;31m" + "failed"
-                    + "\033[0m" + " (Expected Return: " + expectedResult + ", Actual Return: " + result + ") in: "
-                    + elapsedTime + "ms");
-            return false;
+                + "\033[0m" + " (Expected Return: " + expectedResult + ", Actual Return: " + result + ") in: "
+                + elapsedTime + "ms");
+            return true;
         }
     }
-    
+
     private static boolean defaultMode(Object result, Object expectedResult, int scenarioNum, double elapsedTime) {
         System.out.println("Scenario " + "\033[1;97m" + (scenarioNum) + "\033[0m" + ": "
-                + (result.equals(expectedResult) ? "\033[1;32m" + "passed" : "\033[1;31m" + "failed") + "\033[0m");
-        return result.equals(expectedResult);
+            + (result.equals(expectedResult) ? "\033[1;32m" + "passed" : "\033[1;31m" + "failed") + "\033[0m");
+        return !result.equals(expectedResult);
     }
 }

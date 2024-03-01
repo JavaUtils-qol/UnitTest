@@ -105,6 +105,38 @@ public class UnitTest {
         return allTestsPassed;
     }
 
+    public static boolean test(Object obj, Method method, Object[][] parametersList, Object superObj, Method superMethod) throws Exception {
+        // declare vars
+        boolean allTestsPassed = true;
+        int i = 0;
+
+        while (i != parametersList.length) {
+            // calculate elapsed time + get method result
+            double startTime = System.nanoTime();
+            Object result = method.invoke(obj, parametersList[i]);
+            double elapsedTime = (double) Math.round(((System.nanoTime() - startTime) * 0.000001) * 1000d) / 1000d;
+            Object resultSuper = method.invoke(superObj, parametersList[i]);
+
+            // output to console depending on config
+            switch (_config) {
+                case DEFAULT:
+                    if (defaultMode(result, resultSuper, i + 1, elapsedTime))
+                        allTestsPassed = false;
+                    break;
+                case DETAILED:
+                    if (advancedMode(result, resultSuper, i + 1, elapsedTime))
+                        allTestsPassed = false;
+                    break;
+                case NONE:
+                    if (result.equals(resultSuper))
+                        allTestsPassed = false;
+                    break;
+            }
+            i++;
+        }
+        return allTestsPassed;
+    }
+
     /**
      * Used to replace the need to import {@code java.lang.reflec.Method} in the main class.
      * <br><br>
@@ -145,8 +177,7 @@ public class UnitTest {
     }
 
 
-    private UnitTest() {
-    } // set constructor to private to stop object creation
+    private UnitTest() {} // set constructor to private to stop object creation
 
     private static boolean advancedMode(Object result, Object expectedResult, int scenarioNum, double elapsedTime) {
         if (result.equals(expectedResult)) {

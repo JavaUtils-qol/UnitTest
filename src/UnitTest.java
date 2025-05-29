@@ -14,6 +14,7 @@ public class UnitTest {
         DEFAULT,
         /**
          * Will display if the Scenario passed along with the time it took and if it didn't it will display the return value it gave.
+         * It will also display the average time it took to run all the scenarios.
          */
         DETAILED,
         /**
@@ -37,6 +38,8 @@ public class UnitTest {
     public static boolean test(Object obj, Method method, Object[][] parametersList, Object[] resultList) throws Exception {
         // declare vars
         boolean allTestsPassed = true;
+        double averageTime = 0;
+        int passedScenarios = 0;
         int i = 0;
 
         while (i != parametersList.length) {
@@ -45,23 +48,39 @@ public class UnitTest {
             Object result = method.invoke(obj, parametersList[i]);
             double elapsedTime = (double) Math.round(((System.nanoTime() - startTime) * 0.000001) * 1000d) / 1000d;
 
+            // calculate average time
+            if (i == 0) {
+                averageTime = elapsedTime;
+            } else {
+                averageTime = (averageTime + elapsedTime) / 2;    
+            }
+
             // output to console depending on config
             switch (_config) {
                 case DEFAULT:
                     if (defaultMode(result, resultList[i], i + 1, elapsedTime))
                         allTestsPassed = false;
+                        passedScenarios++;
                     break;
                 case DETAILED:
                     if (advancedMode(result, resultList[i], i + 1, elapsedTime))
                         allTestsPassed = false;
+                        passedScenarios++;
                     break;
                 case NONE:
                     if (result.equals(resultList[i]))
                         allTestsPassed = false;
+                        passedScenarios++;
                     break;
             }
             i++;
         }
+
+        // print summary if in detailed mode
+        if (_config == Verbose.DETAILED) {
+            testSummary(averageTime, parametersList.length, passedScenarios);
+        }
+
         return allTestsPassed;
     }
 
@@ -77,6 +96,8 @@ public class UnitTest {
     public static boolean test(Method method, Object[][] parametersList, Object[] resultList) throws Exception {
         // declare vars
         boolean allTestsPassed = true;
+        double averageTime = 0;
+        int passedScenarios = 0;
         int i = 0;
 
         while (i != parametersList.length) {
@@ -84,30 +105,66 @@ public class UnitTest {
             double startTime = System.nanoTime();
             Object result = method.invoke(null, parametersList[i]);
             double elapsedTime = (double) Math.round(((System.nanoTime() - startTime) * 0.000001) * 1000d) / 1000d;
+            
+            // calculate average time
+            if (i == 0) {
+                averageTime = elapsedTime;
+            } else {
+                averageTime = (averageTime + elapsedTime) / 2;    
+            }
+
+            // calculate average time
+            if (i == 0) {
+                averageTime = elapsedTime;
+            } else {
+                averageTime = (averageTime + elapsedTime) / 2;
+            }
 
             // output to console depending on config
             switch (_config) {
                 case DEFAULT:
                     if (defaultMode(result, resultList[i], i + 1, elapsedTime))
                         allTestsPassed = false;
+                        passedScenarios++;
                     break;
                 case DETAILED:
                     if (advancedMode(result, resultList[i], i + 1, elapsedTime))
                         allTestsPassed = false;
+                        passedScenarios++;
                     break;
                 case NONE:
                     if (result.equals(resultList[i]))
                         allTestsPassed = false;
+                        passedScenarios++;
                     break;
             }
             i++;
         }
+
+        // print summary if in detailed mode
+        if (_config == Verbose.DETAILED) {
+            testSummary(averageTime, parametersList.length, passedScenarios);
+        }
+
         return allTestsPassed;
     }
 
+    /**
+     * Will test the given method with the given parameters and will then compare the result with the result of the super method.
+     * 
+     * @param obj - Object containing the method to test
+     * @param method - (Method) - result of {@code setupMethod()}
+     * @param parametersList - (Object[][]) - array of parameters
+     * @param superObj - Object containing the super method
+     * @param superMethod - The method which is supposed to give the wanted results
+     * @return <b>true/false</b> depending on whether all tests passed
+     * @throws Exception
+     */
     public static boolean test(Object obj, Method method, Object[][] parametersList, Object superObj, Method superMethod) throws Exception {
         // declare vars
         boolean allTestsPassed = true;
+        double averageTime = 0;
+        int passedScenarios = 0;
         int i = 0;
 
         while (i != parametersList.length) {
@@ -117,23 +174,39 @@ public class UnitTest {
             double elapsedTime = (double) Math.round(((System.nanoTime() - startTime) * 0.000001) * 1000d) / 1000d;
             Object resultSuper = method.invoke(superObj, parametersList[i]);
 
+            // calculate average time
+            if (i == 0) {
+                averageTime = elapsedTime;
+            } else {
+                averageTime = (averageTime + elapsedTime) / 2;    
+            }
+
             // output to console depending on config
             switch (_config) {
                 case DEFAULT:
                     if (defaultMode(result, resultSuper, i + 1, elapsedTime))
                         allTestsPassed = false;
+                        passedScenarios++;
                     break;
                 case DETAILED:
                     if (advancedMode(result, resultSuper, i + 1, elapsedTime))
                         allTestsPassed = false;
+                        passedScenarios++;
                     break;
                 case NONE:
                     if (result.equals(resultSuper))
                         allTestsPassed = false;
+                        passedScenarios++;
                     break;
             }
             i++;
         }
+
+        // print summary if in detailed mode
+        if (_config == Verbose.DETAILED) {
+            testSummary(averageTime, parametersList.length, passedScenarios);
+        }
+
         return allTestsPassed;
     }
 
@@ -190,6 +263,11 @@ public class UnitTest {
                 + elapsedTime + "ms");
             return true;
         }
+    }
+
+    private static void testSummary(double averageTime, int scenarios, int passedScenarios) {
+        System.out.println("Tests Passed: " + passedScenarios + "/" + scenarios);
+        System.out.println("Average Time: " + averageTime + "ms");
     }
 
     private static boolean defaultMode(Object result, Object expectedResult, int scenarioNum, double elapsedTime) {

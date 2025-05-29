@@ -272,7 +272,11 @@ public class UnitTest {
     }
 
     private static void testSummary(double averageTime, int scenarios, int passedScenarios) {
-        System.out.println("Tests Passed: " + passedScenarios + "/" + scenarios);
+        if (passedScenarios == scenarios) {
+            System.out.println("Tests Passed: " + "\033[1;32m" + passedScenarios + "\033[0m" + "/" + "\033[1;97m" + scenarios + "\033[0m");
+        } else {
+            System.out.println("Tests Passed: " + "\033[1;31m" + passedScenarios + "\033[0m" + "/" + "\033[1;97m" + scenarios + "\033[0m");
+        }
         System.out.println("Average Time: " + averageTime + "ms");
     }
 

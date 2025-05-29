@@ -60,19 +60,21 @@ public class UnitTest {
                 case DEFAULT:
                     if (defaultMode(result, resultList[i], i + 1, elapsedTime))
                         allTestsPassed = false;
-                        passedScenarios++;
                     break;
                 case DETAILED:
                     if (advancedMode(result, resultList[i], i + 1, elapsedTime))
                         allTestsPassed = false;
-                        passedScenarios++;
                     break;
                 case NONE:
-                    if (result.equals(resultList[i]))
+                    if (!result.equals(resultList[i]))
                         allTestsPassed = false;
-                        passedScenarios++;
                     break;
             }
+
+            if (result.equals(resultList[i])) {
+                passedScenarios++;
+            }
+
             i++;
         }
 
@@ -125,19 +127,21 @@ public class UnitTest {
                 case DEFAULT:
                     if (defaultMode(result, resultList[i], i + 1, elapsedTime))
                         allTestsPassed = false;
-                        passedScenarios++;
                     break;
                 case DETAILED:
                     if (advancedMode(result, resultList[i], i + 1, elapsedTime))
                         allTestsPassed = false;
-                        passedScenarios++;
                     break;
                 case NONE:
-                    if (result.equals(resultList[i]))
+                    if (!result.equals(resultList[i]))
                         allTestsPassed = false;
-                        passedScenarios++;
                     break;
             }
+
+            if (result.equals(resultList[i])) {
+                passedScenarios++;
+            }
+
             i++;
         }
 
@@ -186,19 +190,21 @@ public class UnitTest {
                 case DEFAULT:
                     if (defaultMode(result, resultSuper, i + 1, elapsedTime))
                         allTestsPassed = false;
-                        passedScenarios++;
                     break;
                 case DETAILED:
                     if (advancedMode(result, resultSuper, i + 1, elapsedTime))
                         allTestsPassed = false;
-                        passedScenarios++;
                     break;
                 case NONE:
-                    if (result.equals(resultSuper))
+                    if (!result.equals(resultSuper))
                         allTestsPassed = false;
-                        passedScenarios++;
                     break;
             }
+
+            if (result.equals(resultSuper)) {
+                passedScenarios++;
+            }
+
             i++;
         }
 
